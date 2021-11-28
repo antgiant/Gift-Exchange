@@ -8,8 +8,10 @@ if (save_state == null) {
 var name_list = document.getElementById('name-list');
 var selected_list = document.getElementById('selected-list');
 
-function update_name_list() {
-  if (document.getElementsByName("name")[0].value != "") {
+function update_name_list(remove) {
+  if (remove >= 0 && remove < save_state.names.length) {
+    save_state.names.splice(remove, 1);
+  } else if (document.getElementsByName("name")[0].value != "") {
     save_state.names.push([document.getElementsByName("name")[0].value,0]);
     document.getElementsByName("name")[0].value = "";
   }
@@ -17,10 +19,10 @@ function update_name_list() {
   
   for (i = 0; i < save_state.names.length; i++) {
     var item = document.createElement('li');
-    item.innerHTML = "<a href='javascript:add_selected("+i+")'>"+save_state.names[i][0]+"</a>";
+    item.innerHTML = "<a href='javascript:add_selected("+i+")'>"+save_state.names[i][0]+"</a> (<a href='javascript:update_name_list("+i+")'>X</a>)";
     name_list.appendChild(item);
   }
-  
+  update_selected_name_list();
   update_save_state();
 }
 
