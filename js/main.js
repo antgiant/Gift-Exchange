@@ -58,6 +58,7 @@ function update_save_state() {
   }
 }
 
+//Enable Enter Key on Add Name form field
 var input = document.getElementsByName("name")[0];
 input.addEventListener("keyup", function(event) {
   if (event.keyCode === 13) {
