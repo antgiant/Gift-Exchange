@@ -55,3 +55,11 @@ function update_save_state() {
     window.history.replaceState(null, "", "?data="+encodeURIComponent(JSON.stringify(save_state)));
   }
 }
+
+var input = document.getElementsByName("name")[0];
+input.addEventListener("keyup", function(event) {
+  if (event.keyCode === 13) {
+    event.preventDefault();
+    document.getElementById("add").click();
+  }
+});
