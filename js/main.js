@@ -5,6 +5,9 @@ if (save_state == null) {
     names:[],
     selected:[],
   };
+} else {
+  update_name_list();
+  update_selected_name_list();
 }
 var name_list = document.getElementById('name-list');
 var selected_list = document.getElementById('selected-list');
