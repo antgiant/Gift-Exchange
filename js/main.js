@@ -1,3 +1,7 @@
+var name_list = document.getElementById('name-list');
+var selected_list = document.getElementById('selected-list');
+var suggested_pairings = document.getElementById('suggested-pairing');
+
 const urlParams = new URLSearchParams(window.location.search);
 var save_state = JSON.parse(urlParams.get('data'));
 if (save_state == null) {
@@ -10,10 +14,6 @@ if (save_state == null) {
   update_name_list();
   update_selected_name_list();
 }
-var name_list = document.getElementById('name-list');
-var selected_list = document.getElementById('selected-list');
-var suggested_pairings = document.getElementById('suggested-pairing');
-
 function update_name_list(remove) {
   if (remove >= 0 && remove < save_state.names.length) {
     for(i = 0; i < save_state.names.length; i++) {
