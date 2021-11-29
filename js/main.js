@@ -12,6 +12,7 @@ if (save_state == null) {
 }
 var name_list = document.getElementById('name-list');
 var selected_list = document.getElementById('selected-list');
+var suggested_pairings = document.getElementById('suggested-pairing');
 
 function update_name_list(remove) {
   if (remove >= 0 && remove < save_state.names.length) {
@@ -70,21 +71,37 @@ function update_selected_name_list(selected, state) {
     save_state.selected[selected] = state;
   }
   selected_list.innerHTML = "";
-
+  var selected_count = 0;
   for (i = 0; i < save_state.selected.length; i++) {
     if (save_state.selected[i] == 1) {
       var item = document.createElement('li');
       item.innerHTML = "<a href='javascript:remove_selected("+i+")'>"+save_state.names[i]+"</a>";
       selected_list.appendChild(item);
+      selected_count++;
     }
   }
-
+  update_suggested(selected_count);
   update_save_state();
 }
 
 function toggle_exclusions_item(name,exclusion) {
   save_state.exclusions[name][exclusion] = !save_state.exclusions[name][exclusion];
   update_name_list();
+}
+
+function update_suggested(count) {
+  if (count > 1) {
+    document.getElementById("suggested").style.display = 'block';
+  } else {
+    document.getElementById("suggested").style.display = 'none';
+  }
+  suggested_pairings.innerHTML = "";
+
+  var temp_pairings = [];
+
+  var item = document.createElement('li');
+  item.innerHTML = "No Pairings Yet";
+  suggested_pairings.appendChild(item);
 }
 
 function update_save_state() {

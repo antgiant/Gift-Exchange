@@ -22,3 +22,6 @@ ul {
 #suggested,#previous {
   display: none;
 }
+hr {
+  border-top: 4px dotted rgb(79, 185, 227);
+}
