@@ -4,6 +4,7 @@ if (save_state == null) {
   save_state = {
     names:[],
     selected:[],
+    exclusions:[],
   };
 } else {
   update_name_list();
@@ -14,8 +15,12 @@ var selected_list = document.getElementById('selected-list');
 
 function update_name_list(remove) {
   if (remove >= 0 && remove < save_state.names.length) {
+    for(i = 0; i < save_state.names.length; i++) {
+      save_state.exclusions[i].splice(remove, 1);
+    }
     save_state.names.splice(remove, 1);
     save_state.selected.splice(remove, 1);
+    save_state.exclusions.splice(remove, 1);
   } else if (document.getElementsByName("name")[0].value != "") {
     save_state.names.push(document.getElementsByName("name")[0].value);
     save_state.selected.push(0);
@@ -26,11 +31,22 @@ function update_name_list(remove) {
   for (i = 0; i < save_state.names.length; i++) {
     var item = document.createElement('li');
     var exclusion_list = document.createElement('ul');
+    if (typeof save_state.exclusions[i] === "undefined") {
+      save_state.exclusions[i] = [];
+    }
     for (j = 0; j < save_state.names.length; j++) {
       if (i != j) {
+        if (typeof save_state.exclusions[i][j] === "undefined") {
+          save_state.exclusions[i][j] = false;
+        }
         var exclusion_item = document.createElement('li');
-        exclusion_item.innerHTML = save_state.names[j];
+        exclusion_item.innerHTML = "<a href='javascript:toggle_exclusions_item("+i+","+j+")'>"+save_state.names[j]+"</a>";
+        if (save_state.exclusions[i][j] === true) {
+          exclusion_item.innerHTML = "<strike>"+exclusion_item.innerHTML+"</strike>"
+        }
         exclusion_list.appendChild(exclusion_item);
+      } else {
+        save_state.exclusions[i][j] = true;
       }
       
     }
@@ -64,6 +80,11 @@ function update_selected_name_list(selected, state) {
   }
 
   update_save_state();
+}
+
+function toggle_exclusions_item(name,exclusion) {
+  save_state.exclusions[name][exclusion] = !save_state.exclusions[name][exclusion];
+  update_name_list();
 }
 
 function update_save_state() {
