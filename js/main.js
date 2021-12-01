@@ -1,30 +1,37 @@
 var name_list = document.getElementById('name-list');
 var selected_list = document.getElementById('selected-list');
 var suggested_pairings = document.getElementById('suggested-pairing');
+var current_list_id = 0;
 
 const urlParams = new URLSearchParams(window.location.search);
 var save_state = JSON.parse(urlParams.get('data'));
 if (save_state == null) {
   save_state = {
     names:[],
-    selected:[],
-    exclusions:[],
+    exchange: [{
+      title:"",
+      selected:[],
+      individual_exclusions:[],
+      groupings:[],
+      grouping_exclusions:[],
+    }]
   };
 } else {
+  current_list_id = save_state.exchange.length - 1;
   update_name_list();
   update_selected_name_list();
 }
 function update_name_list(remove) {
   if (remove >= 0 && remove < save_state.names.length) {
     for(i = 0; i < save_state.names.length; i++) {
-      save_state.exclusions[i].splice(remove, 1);
+      save_state.exchange[current_list_id].individual_exclusions[i].splice(remove, 1);
     }
     save_state.names.splice(remove, 1);
-    save_state.selected.splice(remove, 1);
-    save_state.exclusions.splice(remove, 1);
+    save_state.exchange[current_list_id].selected.splice(remove, 1);
+    save_state.exchange[current_list_id].individual_exclusions.splice(remove, 1);
   } else if (document.getElementsByName("name")[0].value != "") {
     save_state.names.push(document.getElementsByName("name")[0].value);
-    save_state.selected.push(0);
+    save_state.exchange[current_list_id].selected.push(0);
     document.getElementsByName("name")[0].value = "";
   }
   name_list.innerHTML = "";
@@ -32,22 +39,22 @@ function update_name_list(remove) {
   for (i = 0; i < save_state.names.length; i++) {
     var item = document.createElement('li');
     var exclusion_list = document.createElement('ul');
-    if (typeof save_state.exclusions[i] === "undefined") {
-      save_state.exclusions[i] = [];
+    if (typeof save_state.exchange[current_list_id].individual_exclusions[i] === "undefined") {
+      save_state.exchange[current_list_id].individual_exclusions[i] = [];
     }
     for (j = 0; j < save_state.names.length; j++) {
       if (i != j) {
-        if (typeof save_state.exclusions[i][j] === "undefined") {
-          save_state.exclusions[i][j] = false;
+        if (typeof save_state.exchange[current_list_id].individual_exclusions[i][j] === "undefined") {
+          save_state.exchange[current_list_id].individual_exclusions[i][j] = false;
         }
         var exclusion_item = document.createElement('li');
         exclusion_item.innerHTML = "<a href='javascript:toggle_exclusions_item("+i+","+j+")'>"+save_state.names[j]+"</a>";
-        if (save_state.exclusions[i][j] === true) {
+        if (save_state.exchange[current_list_id].individual_exclusions[i][j] === true) {
           exclusion_item.innerHTML = "<strike>"+exclusion_item.innerHTML+"</strike>"
         }
         exclusion_list.appendChild(exclusion_item);
       } else {
-        save_state.exclusions[i][j] = true;
+        save_state.exchange[current_list_id].individual_exclusions[i][j] = true;
       }
       
     }
@@ -67,13 +74,13 @@ function remove_selected(selected) {
 }
 
 function update_selected_name_list(selected, state) {
-  if (selected >= 0 && selected < save_state.selected.length) {
-    save_state.selected[selected] = state;
+  if (selected >= 0 && selected < save_state.exchange[current_list_id].selected.length) {
+    save_state.exchange[current_list_id].selected[selected] = state;
   }
   selected_list.innerHTML = "";
   var selected_count = 0;
-  for (i = 0; i < save_state.selected.length; i++) {
-    if (save_state.selected[i] == 1) {
+  for (i = 0; i < save_state.exchange[current_list_id].selected.length; i++) {
+    if (save_state.exchange[current_list_id].selected[i] == 1) {
       var item = document.createElement('li');
       item.innerHTML = "<a href='javascript:remove_selected("+i+")'>"+save_state.names[i]+"</a>";
       selected_list.appendChild(item);
@@ -85,7 +92,7 @@ function update_selected_name_list(selected, state) {
 }
 
 function toggle_exclusions_item(name,exclusion) {
-  save_state.exclusions[name][exclusion] = !save_state.exclusions[name][exclusion];
+  save_state.exchange[current_list_id].individual_exclusions[name][exclusion] = !save_state.exchange[current_list_id].individual_exclusions[name][exclusion];
   update_name_list();
 }
 
