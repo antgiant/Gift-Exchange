@@ -8,6 +8,7 @@ var save_state = JSON.parse(urlParams.get('data'));
 if (save_state == null) {
   save_state = {
     names:[],
+    locked:[],
     exchange: [{
       title:"",
       selected:[],
@@ -22,17 +23,21 @@ if (save_state == null) {
   update_selected_name_list();
 }
 function update_name_list(remove) {
-  if (remove >= 0 && remove < save_state.names.length) {
-    for(i = 0; i < save_state.names.length; i++) {
-      save_state.exchange[current_list_id].individual_exclusions[i].splice(remove, 1);
+  if (save_state.locked[remove] == null || save_state.locked[remove] < 1) {
+    if (remove >= 0 && remove < save_state.names.length) {
+      for(i = 0; i < save_state.names.length; i++) {
+        save_state.exchange[current_list_id].individual_exclusions[i].splice(remove, 1);
+      }
+      save_state.names.splice(remove, 1);
+      save_state.locked.splice(remove, 1);
+      save_state.exchange[current_list_id].selected.splice(remove, 1);
+      save_state.exchange[current_list_id].individual_exclusions.splice(remove, 1);
+    } else if (document.getElementsByName("name")[0].value != "") {
+      save_state.names.push(document.getElementsByName("name")[0].value);
+      save_state.locked.push(0);
+      save_state.exchange[current_list_id].selected.push(0);
+      document.getElementsByName("name")[0].value = "";
     }
-    save_state.names.splice(remove, 1);
-    save_state.exchange[current_list_id].selected.splice(remove, 1);
-    save_state.exchange[current_list_id].individual_exclusions.splice(remove, 1);
-  } else if (document.getElementsByName("name")[0].value != "") {
-    save_state.names.push(document.getElementsByName("name")[0].value);
-    save_state.exchange[current_list_id].selected.push(0);
-    document.getElementsByName("name")[0].value = "";
   }
   name_list.innerHTML = "";
   
@@ -58,10 +63,13 @@ function update_name_list(remove) {
       }
       
     }
-    item.innerHTML = "<a href='javascript:add_selected("+i+")'>"+save_state.names[i]+"</a> (<a href='javascript:update_name_list("+i+")'>X</a>)\n<ul>" + exclusion_list.innerHTML + "</ul>";
+    item.innerHTML = "<a href='javascript:add_selected("+i+")'>"+save_state.names[i]+"</a>";
+    if (save_state.locked[i] < 1) {
+      item.innerHTML += " (<a href='javascript:update_name_list("+i+")'>X</a>)";
+    }
+    item.innerHTML += "\n<ul>" + exclusion_list.innerHTML + "</ul>";
     name_list.appendChild(item);
   }
-  update_selected_name_list();
   update_save_state();
 }
 
@@ -75,6 +83,13 @@ function remove_selected(selected) {
 
 function update_selected_name_list(selected, state) {
   if (selected >= 0 && selected < save_state.exchange[current_list_id].selected.length) {
+    if (save_state.exchange[current_list_id].selected[selected] != state) {
+      if (state === 1) {
+        save_state.locked[selected]++;
+      } else {
+        save_state.locked[selected]--;
+      }
+    }
     save_state.exchange[current_list_id].selected[selected] = state;
   }
   selected_list.innerHTML = "";
@@ -87,6 +102,7 @@ function update_selected_name_list(selected, state) {
       selected_count++;
     }
   }
+  update_name_list();
   update_suggested(selected_count);
   update_save_state();
 }
